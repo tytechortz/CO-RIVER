@@ -482,6 +482,78 @@ def lake_graphs(powell_data, mead_data, combo_data):
     time.sleep(2)
     return {'data': powell_traces, 'layout': powell_layout}, {'data': mead_traces, 'layout': mead_layout}, {'data': combo_traces, 'layout': combo_layout}
 
+@app.callback([
+    Output('powell-annual-changes', 'figure'),
+    Output('mead-annual-changes', 'figure'),
+    Output('combo-annual-changes', 'figure')],
+    [Input('powell-annual-change', 'data'),
+    Input('mead-annual-change', 'data'),
+    Input('combo-annual-change', 'data'),])
+def change_graphs(powell_data, mead_data, combo_data):
+    df_powell = pd.read_json(powell_data)
+    df_mead = pd.read_json(mead_data)
+    df_combo = pd.read_json(combo_data)
+    pd.set_option('display.max_columns', None)
+    # print(df_powell)
+    # print(df_mead)
+    # df_combo = df_combo.drop(df_combo.columns[[2,3,4,5]], axis=1)
+    # print(df_combo)
+    # df_powell['diff'] = (df_powell['diff'] !='n').astype(int)
+
+    mead_traces = []
+    powell_traces = []
+    combo_traces = []
+
+    # data = powell_traces.sort_index()
+
+    powell_traces.append(go.Bar(
+        y = df_powell['diff'],
+        x = df_powell.index,
+        marker_color = df_powell['color']
+    )),
+
+    mead_traces.append(go.Bar(
+        y = df_mead['diff'],
+        x = df_mead.index,
+        marker_color = df_mead['color']
+    )),
+
+    combo_traces.append(go.Bar(
+        y = df_combo['diff'],
+        x = df_combo.index,
+        marker_color = df_combo['color']
+    )),
+
+    powell_layout = go.Layout(
+        height =400,
+        title = 'Lake Powell',
+        yaxis = {'title':'Volume (AF)'},
+        paper_bgcolor="#1f2630",
+        plot_bgcolor="#1f2630",
+        font=dict(color="#2cfec1"),
+    )
+
+    mead_layout = go.Layout(
+        height =400,
+        title = 'Lake Mead',
+        yaxis = {'title':'Volume (AF)'},
+        paper_bgcolor="#1f2630",
+        plot_bgcolor="#1f2630",
+        font=dict(color="#2cfec1"),
+    )
+
+    combo_layout = go.Layout(
+        height =400,
+        title = 'Powell + Mead',
+        yaxis = {'title':'Volume (AF)'},
+        paper_bgcolor="#1f2630",
+        plot_bgcolor="#1f2630",
+        font=dict(color="#2cfec1"),
+    )
+
+    return {'data': powell_traces, 'layout': powell_layout}, {'data': mead_traces, 'layout': mead_layout}, {'data': combo_traces, 'layout': combo_layout}
+
+
 ############################# STATS CALLBACKS #####################################
 
 @app.callback([
