@@ -29,8 +29,13 @@ days = delta.days
 
 capacities = {'Lake Powell Glen Canyon Dam and Powerplant': 24322000, 'Lake Mead Hoover Dam and Powerplant': 26134000, 'FLAMING GORGE RESERVOIR': 3788700, 'NAVAJO RESERVOIR': 1708600, 'BLUE MESA RESERVOIR': 940800, 'Powell Mead Combo': 50456000}
 
+powell_data_url= 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=509&before=' + today + '&after=1999-12-29&filename=Lake%20Powell%20Glen%20Canyon%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20'
 
+mead_data_url = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=6124&before=' + today + '&after=1999-12-30&filename=Lake%20Mead%20Hoover%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20(1937-05-28%20-%202020-11-30)&order=ASC'
 
+powell_data_raw = pd.read_csv(powell_data_url)
+mead_data_raw = pd.read_csv(mead_data_url)
+# print(powell_data)
 
 def get_header():
 
@@ -70,7 +75,7 @@ def get_navbar(p = 'homepage'):
         html.Div([
             dcc.Link(
                 html.H6(children='Upper Reservoirs'),
-                href='/apps/ur'
+                href='/ur'
             )
         ],
             className='col-2',
@@ -79,7 +84,7 @@ def get_navbar(p = 'homepage'):
         html.Div([
             dcc.Link(
                 html.H6(children='Drought'),
-                href='/apps/drought'
+                href='/drought'
             )
         ],
             className='col-2',
@@ -113,37 +118,303 @@ def get_navbar(p = 'homepage'):
     else:
         return non_home
 
-def home_page_App():
+homepage = html.Div([
+    get_header(),
+    get_navbar('homepage'),
+    get_emptyrow(),
+    html.Div([
+        html.Div([
+            dcc.Loading(
+            id="loading-powell",
+            type="default",
+            children=html.Div(dcc.Graph(id='powell-levels'))),
+        ],
+            className='four columns'
+        ),
+        html.Div([
+            dcc.Loading(
+            id="loading-mead",
+            type="default",
+            children=html.Div(dcc.Graph(id='mead-levels'))),
+        ],
+            className='four columns'
+        ),
+        html.Div([
+            dcc.Loading(
+            id="loading-combo",
+            type="default",
+            children=html.Div(dcc.Graph(id='combo-levels'))),
+        ],
+            className='four columns'
+        ),
+    ],
+        className='row'
+    ),
+    html.Div([
+        html.Div([
+            html.H6('Current Storage - AF', style={'text-align': 'center'})
+        ],
+            className='three columns'
+        ),
+        html.Div([
+            html.H6('Pct. Full', style={'text-align': 'center'})
+        ],
+            className='one column'
+        ),
+        html.Div([
+            html.H6('24 hr', style={'text-align': 'center'})
+        ],
+            className='one column'
+        ),
+        html.Div([
+            html.H6('C.Y.', style={'text-align': 'center'})
+        ],
+            className='one column'
+        ),
+        html.Div([
+            html.H6('Year', style={'text-align': 'center'})
+        ],
+            className='one column'
+        ),
+        html.Div([
+            html.H6('Rec Low', style={'text-align': 'center'})
+        ],
+            className='one column'
+        ),
+        html.Div([
+            html.H6('Diff', style={'text-align': 'center'})
+        ],
+            className='one column'
+        ),
+        html.Div([
+            html.H6('Rec Low Date', style={'text-align': 'center'})
+        ],
+            className='two columns'
+        ),
+    ],
+        className='row'
+    ),
+    html.Div([
+        html.Div(id='cur-levels')
+    ],
+        className='row'
+    ),
+    html.Div([
+        html.Div([
+            dcc.Graph(
+                id='powell-annual-changes'
+            )
+        ],
+            className='four columns'
+        ),
+        html.Div([
+            dcc.Graph(
+                id='mead-annual-changes'
+            )
+        ],
+            className='four columns'
+        ),
+        html.Div([
+            dcc.Graph(
+                id='combo-annual-changes'
+            )
+        ],
+            className='four columns'
+        ),
+        
+    ],
+        className='row'
+    ),
+    html.Div([
+        html.Div([
+            dcc.Link(
+                html.H6(children='Powell Data'),
+                href='/apps/powell'
+            )
+        ],
+            className='four columns',
+            style={'text-align': 'center'}
+        ),
+    ],
+        className='row'
+    ),
+    dcc.Interval(
+        id='interval-component',
+        interval=500*1000, # in milliseconds
+        n_intervals=0
+    ),
+    dcc.Store(id='powell-water-data'),
+    dcc.Store(id='mead-water-data'),
+    dcc.Store(id='combo-water-data'),
+    dcc.Store(id='powell-annual-change'),
+    dcc.Store(id='mead-annual-change'),
+    dcc.Store(id='combo-annual-change'),
+])
+
+# def home_page_App():
+#     return html.Div([
+#         get_header(),
+#         get_navbar('homepage'),
+#         get_emptyrow(),
+
+#         html.Div([
+#             html.Div([
+#                 dcc.Loading(
+#                 id="loading-powell",
+#                 type="default",
+#                 children=html.Div(dcc.Graph(id='powell-levels'))),
+#             ],
+#                 className='four columns'
+#             ),
+#             html.Div([
+#                 dcc.Loading(
+#                 id="loading-mead",
+#                 type="default",
+#                 children=html.Div(dcc.Graph(id='mead-levels'))),
+#             ],
+#                 className='four columns'
+#             ),
+#             html.Div([
+#                 dcc.Loading(
+#                 id="loading-combo",
+#                 type="default",
+#                 children=html.Div(dcc.Graph(id='combo-levels'))),
+#             ],
+#                 className='four columns'
+#             ),
+#         ],
+#             className='row'
+#         ),
+#         html.Div([
+#             html.Div([
+#                 html.H6('Current Storage - AF', style={'text-align': 'center'})
+#             ],
+#                 className='three columns'
+#             ),
+#             html.Div([
+#                 html.H6('Pct. Full', style={'text-align': 'center'})
+#             ],
+#                 className='one column'
+#             ),
+#             html.Div([
+#                 html.H6('24 hr', style={'text-align': 'center'})
+#             ],
+#                 className='one column'
+#             ),
+#             html.Div([
+#                 html.H6('C.Y.', style={'text-align': 'center'})
+#             ],
+#                 className='one column'
+#             ),
+#             html.Div([
+#                 html.H6('Year', style={'text-align': 'center'})
+#             ],
+#                 className='one column'
+#             ),
+#             html.Div([
+#                 html.H6('Rec Low', style={'text-align': 'center'})
+#             ],
+#                 className='one column'
+#             ),
+#             html.Div([
+#                 html.H6('Diff', style={'text-align': 'center'})
+#             ],
+#                 className='one column'
+#             ),
+#             html.Div([
+#                 html.H6('Rec Low Date', style={'text-align': 'center'})
+#             ],
+#                 className='two columns'
+#             ),
+#         ],
+#             className='row'
+#         ),
+#         html.Div([
+#             html.Div(id='cur-levels')
+#         ],
+#             className='row'
+#         ),
+#         html.Div([
+#             html.Div([
+#                 dcc.Graph(
+#                     id='powell-annual-changes'
+#                 )
+#             ],
+#                 className='four columns'
+#             ),
+#             html.Div([
+#                 dcc.Graph(
+#                     id='mead-annual-changes'
+#                 )
+#             ],
+#                 className='four columns'
+#             ),
+#             html.Div([
+#                 dcc.Graph(
+#                     id='combo-annual-changes'
+#                 )
+#             ],
+#                 className='four columns'
+#             ),
+            
+#         ],
+#             className='row'
+#         ),
+#         html.Div([
+#             html.Div([
+#                 dcc.Link(
+#                     html.H6(children='Powell Data'),
+#                     href='/apps/powell'
+#                 )
+#             ],
+#                 className='four columns',
+#                 style={'text-align': 'center'}
+#             ),
+#         ],
+#             className='row'
+#         ),
+#         dcc.Interval(
+#             id='interval-component',
+#             interval=500*1000, # in milliseconds
+#             n_intervals=0
+#         ),
+#         dcc.Store(id='powell-water-data'),
+#         dcc.Store(id='mead-water-data'),
+#         dcc.Store(id='combo-water-data'),
+#         dcc.Store(id='powell-annual-change'),
+#         dcc.Store(id='mead-annual-change'),
+#         dcc.Store(id='combo-annual-change'),
+#     ])
+
+def ur_App():
     return html.Div([
         get_header(),
-        get_navbar('homepage'),
+        get_navbar("non_home"),
         get_emptyrow(),
 
         html.Div([
             html.Div([
-                dcc.Loading(
-                id="loading-powell",
-                type="default",
-                children=html.Div(dcc.Graph(id='powell-levels'))),
+                dcc.Graph(
+                    id='bm-levels',
+                ),
             ],
                 className='four columns'
             ),
             html.Div([
-                dcc.Loading(
-                id="loading-mead",
-                type="default",
-                children=html.Div(dcc.Graph(id='mead-levels'))),
+                dcc.Graph(
+                    id='navajo-levels',
+                ),
             ],
                 className='four columns'
             ),
             html.Div([
-                dcc.Loading(
-                id="loading-combo",
-                type="default",
-                children=html.Div(dcc.Graph(id='combo-levels'))),
+                dcc.Graph(
+                    id='fg-levels',
+                ),
             ],
                 className='four columns'
             ),
+
         ],
             className='row'
         ),
@@ -189,49 +460,10 @@ def home_page_App():
                 className='two columns'
             ),
         ],
-            className='row'
+        className='row'
         ),
         html.Div([
-            html.Div(id='cur-levels')
-        ],
-            className='row'
-        ),
-        html.Div([
-            html.Div([
-                dcc.Graph(
-                    id='powell-annual-changes'
-                )
-            ],
-                className='four columns'
-            ),
-            html.Div([
-                dcc.Graph(
-                    id='mead-annual-changes'
-                )
-            ],
-                className='four columns'
-            ),
-            html.Div([
-                dcc.Graph(
-                    id='combo-annual-changes'
-                )
-            ],
-                className='four columns'
-            ),
-            
-        ],
-            className='row'
-        ),
-        html.Div([
-            html.Div([
-                dcc.Link(
-                    html.H6(children='Powell Data'),
-                    href='/apps/powell'
-                )
-            ],
-                className='four columns',
-                style={'text-align': 'center'}
-            ),
+            html.Div(id='upper-cur-levels')
         ],
             className='row'
         ),
@@ -240,12 +472,6 @@ def home_page_App():
             interval=500*1000, # in milliseconds
             n_intervals=0
         ),
-        dcc.Store(id='powell-water-data'),
-        dcc.Store(id='mead-water-data'),
-        dcc.Store(id='combo-water-data'),
-        dcc.Store(id='powell-annual-change'),
-        dcc.Store(id='mead-annual-change'),
-        dcc.Store(id='combo-annual-change'),
     ])
 
 url_bar_and_content_div = html.Div([
@@ -253,15 +479,16 @@ url_bar_and_content_div = html.Div([
     html.Div(id='page-content')
 ])
 
-homepage = html.Div([
-    home_page_App(),
-    # dcc.Link('Upper Reservoirs"', href='/page-1'),
-    # html.Br(),
-    # dcc.Link('Navigate to "/page-2"', href='/page-2'),
-])
+# homepage = html.Div([
+#     home_page_App(),
+#     # dcc.Link('Upper Reservoirs"', href='/page-1'),
+#     # html.Br(),
+#     # dcc.Link('Navigate to "/page-2"', href='/page-2'),
+# ])
 
-layout_page_1 = html.Div([
+layout_ur = html.Div([
     get_header(),
+    ur_App(),
     # dcc.Input(id='input-1-state', type='text', value='Montreal'),
     # dcc.Input(id='input-2-state', type='text', value='Canada'),
     # html.Button(id='submit-button', n_clicks=0, children='Submit'),
@@ -278,7 +505,7 @@ app.layout = url_bar_and_content_div
 app.validation_layout = html.Div([
     url_bar_and_content_div,
     homepage,
-    layout_page_1,
+    layout_ur,
     # layout_page_2,
 ])
 
@@ -288,8 +515,8 @@ app.validation_layout = html.Div([
 def display_page(pathname):
     if pathname == "/":
         return homepage
-    elif pathname == "/page-1":
-        return layout_page_1
+    elif pathname == "/ur":
+        return layout_ur
     elif pathname == "/page-2":
         return layout_page_2
     else:
@@ -316,59 +543,61 @@ def update_output(n_clicks, input1, input2):
     Input('interval-component', 'n_intervals'))
 def clean_powell_data(n):
 
-    powell_data = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=509&before=' + today + '&after=1999-12-29&filename=Lake%20Powell%20Glen%20Canyon%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20'
+    # powell_data = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=509&before=' + today + '&after=1999-12-29&filename=Lake%20Powell%20Glen%20Canyon%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20'
 
-    mead_data = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=6124&before=' + today + '&after=1999-12-30&filename=Lake%20Mead%20Hoover%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20(1937-05-28%20-%202020-11-30)&order=ASC'
+    # mead_data = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=6124&before=' + today + '&after=1999-12-30&filename=Lake%20Mead%20Hoover%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20(1937-05-28%20-%202020-11-30)&order=ASC'
 
 
     # https://data.usbr.gov/rise/api/result/download?type=csv&itemId=509&before=2021-09-22&after=1999-12-29&filename=Lake%20Powell%20Glen%20Canyon%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20
 
 
-    with requests.Session() as s:
+    # with requests.Session() as s:
 
-        powell_download = s.get(powell_data)
+    #     powell_download = s.get(powell_data)
         
-        powell_decoded_content = powell_download.content.decode('utf-8')
+    #     powell_decoded_content = powell_download.content.decode('utf-8')
     
-        crp = csv.reader(powell_decoded_content.splitlines(), delimiter=',')
+    #     crp = csv.reader(powell_decoded_content.splitlines(), delimiter=',')
         
         
-        for i in range(9): next(crp)
-        df_powell_water = pd.DataFrame(crp)
+    #     for i in range(9): next(crp)
+    #     df_powell_water = pd.DataFrame(crp)
         
-        df_powell_water = df_powell_water.drop(df_powell_water.columns[[1,3,4,5,7,8]], axis=1)
-        df_powell_water.columns = ["Site", "Water Level", "Date"]
+    df_powell_water = powell_data_raw.drop(powell_data_raw.columns[[1,3,4,5,7,8]], axis=1)
     
-        df_powell_water = df_powell_water[1:]
-        
-        df_powell_water['power level'] = 6124000
-        df_powell_water['sick pool'] = 4158000
-        df_powell_water['dead pool'] = 1895000
-
-        df_powell_water = df_powell_water.set_index("Date")
-        df_powell_water = df_powell_water.sort_index()
-        print(df_powell_water)
-
-        mead_download = s.get(mead_data)
-
-        mead_decoded_content = mead_download.content.decode('utf-8')
-
-        crm = csv.reader(mead_decoded_content.splitlines(), delimiter=',')
-
-        for i in range(9): next(crm)
-        df_mead_water = pd.DataFrame(crm)
-        df_mead_water = df_mead_water.drop(df_mead_water.columns[[1,3,4,5,7,8]], axis=1)
-        df_mead_water.columns = ["Site", "Water Level", "Date"]
+    df_powell_water.columns = ["Site", "Water Level", "Date"]
     
-        df_mead_water['1090'] = 10857000
-        df_mead_water['1075'] = 9601000
-        df_mead_water['1050'] = 7683000
-        df_mead_water['1025'] = 5981000
-        df_mead_water['Dead Pool'] = 2547000
+    df_powell_water = df_powell_water[10:]
+    
+    df_powell_water['power level'] = 6124000
+    df_powell_water['sick pool'] = 4158000
+    df_powell_water['dead pool'] = 1895000
+   
+    df_powell_water = df_powell_water.set_index("Date")
+    df_powell_water = df_powell_water.sort_index()
+    print(df_powell_water)
 
-        df_mead_water = df_mead_water.set_index("Date")
-        df_mead_water = df_mead_water.sort_index()
-        # print(df_mead_water)
+        # mead_download = s.get(mead_data)
+
+        # mead_decoded_content = mead_download.content.decode('utf-8')
+
+        # crm = csv.reader(mead_decoded_content.splitlines(), delimiter=',')
+
+        # for i in range(9): next(crm)
+        # df_mead_water = pd.DataFrame(crm)
+    df_mead_water = mead_data_raw.drop(mead_data_raw.columns[[1,3,4,5,7,8]], axis=1)
+    df_mead_water.columns = ["Site", "Water Level", "Date"]
+    df_mead_water = df_mead_water[7:]
+    
+    df_mead_water['1090'] = 10857000
+    df_mead_water['1075'] = 9601000
+    df_mead_water['1050'] = 7683000
+    df_mead_water['1025'] = 5981000
+    df_mead_water['Dead Pool'] = 2547000
+
+    df_mead_water = df_mead_water.set_index("Date")
+    df_mead_water = df_mead_water.sort_index(ascending=True)
+    print(df_mead_water)
     
     powell_df = df_powell_water.drop(df_powell_water.index[0])
     mead_df = df_mead_water.drop(df_mead_water.index[0])
@@ -393,6 +622,83 @@ def clean_powell_data(n):
     # print(combo_df)
 
     return powell_df.to_json(), mead_df.to_json(), combo_df.to_json()
+
+###################### UPPER RES DATA ################
+
+@app.callback([
+    Output('blue-mesa-water-data', 'data'),
+    Output('navajo-water-data', 'data'),
+    Output('fg-water-data', 'data')],
+    Input('interval-component', 'n_intervals'))
+def clean_powell_data(n):
+    # bm_df = pd.read_json(bm_data)
+    # nav_df = pd.read_json(nav_data)
+    # fg_df = pd.read_json(fg_data)
+
+    blue_mesa_data = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=76&before=' + today + '&after=1999-12-30&filename=Blue%20Mesa%20Reservoir%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20(2000-01-01%20-%202021-07-14)&order=ASC'
+
+    navajo_data = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=613&before=' + today + '&after=1999-12-30&filename=Navajo%20Reservoir%20and%20Dam%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20(1999-12-31%20-%202021-07-14)&order=ASC'
+
+    fg_data = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=337&before=' + today + '&after=1999-12-30&filename=Flaming%20Gorge%20Reservoir%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20(1999-12-31%20-%202021-07-15)&order=ASC'
+
+    with requests.Session() as s:
+        blue_mesa_download = s.get(blue_mesa_data)
+
+        blue_mesa_decoded_content = blue_mesa_download.content.decode('utf-8')
+
+        crm = csv.reader(blue_mesa_decoded_content.splitlines(), delimiter=',')
+
+        for i in range(9): next(crm)
+        df_bm_water = pd.DataFrame(crm)
+        df_bm_water = df_bm_water.drop(df_bm_water.columns[[1,3,4,5,7,8]], axis=1)
+        df_bm_water.columns = ["Site", "Value", "Date"]
+
+        # df_bm_water = df_bm_water[1:]
+    
+
+        df_bm_water = df_bm_water.set_index("Date")
+        df_bm_water = df_bm_water.sort_index()
+
+        navajo_download = s.get(navajo_data)
+
+        navajo_decoded_content = navajo_download.content.decode('utf-8')
+
+        crm = csv.reader(navajo_decoded_content.splitlines(), delimiter=',')
+
+        for i in range(9): next(crm)
+        df_nav_water = pd.DataFrame(crm)
+        df_nav_water = df_nav_water.drop(df_nav_water.columns[[1,3,4,5,7,8]], axis=1)
+        df_nav_water.columns = ["Site", "Value", "Date"]
+
+        # df_bm_water = df_bm_water[1:]
+    
+
+        df_nav_water = df_nav_water.set_index("Date")
+        df_nav_water = df_nav_water.sort_index()
+
+        fg_download = s.get(fg_data)
+
+        fg_decoded_content = fg_download.content.decode('utf-8')
+
+        crm = csv.reader(fg_decoded_content.splitlines(), delimiter=',')
+
+        for i in range(9): next(crm)
+        df_fg_water = pd.DataFrame(crm)
+        df_fg_water = df_fg_water.drop(df_fg_water.columns[[1,3,4,5,7,8]], axis=1)
+        df_fg_water.columns = ["Site", "Value", "Date"]
+
+        # df_bm_water = df_bm_water[1:]
+    
+
+        df_fg_water = df_fg_water.set_index("Date")
+        df_fg_water = df_fg_water.sort_index()
+
+    blue_mesa_df = df_bm_water.drop(df_bm_water.index[0])
+    navajo_df = df_nav_water.drop(df_nav_water.index[0])
+    fg_df = df_fg_water.drop(df_fg_water.index[0])
+
+
+    return blue_mesa_df.to_json(), navajo_df.to_json(), fg_df.to_json()
 
 
 #################### GRAPH CALLBACKS ################################
@@ -481,6 +787,67 @@ def lake_graphs(powell_data, mead_data, combo_data):
 
     time.sleep(2)
     return {'data': powell_traces, 'layout': powell_layout}, {'data': mead_traces, 'layout': mead_layout}, {'data': combo_traces, 'layout': combo_layout}
+
+
+@app.callback([
+    Output('bm-levels', 'figure'),
+    Output('navajo-levels', 'figure'),
+    Output('fg-levels', 'figure')],
+    [Input('blue-mesa-water-data', 'data'),
+    Input('navajo-water-data', 'data'),
+    Input('fg-water-data', 'data')])
+def lake_graph(bm_data, nav_data, fg_data):
+    bm_df = pd.read_json(bm_data)
+    nav_df = pd.read_json(nav_data)
+    fg_df = pd.read_json(fg_data)
+
+    bm_traces = []
+    nav_traces = []
+    fg_traces = []
+
+    bm_traces.append(go.Scatter(
+        y = bm_df['Value'],
+        x = bm_df.index,
+    ))
+
+    nav_traces.append(go.Scatter(
+        y = nav_df['Value'],
+        x = nav_df.index,
+    ))
+
+    fg_traces.append(go.Scatter(
+        y = fg_df['Value'],
+        x = fg_df.index,
+    ))
+
+    bm_layout = go.Layout(
+        height =400,
+        title = 'Blue Mesa Storage',
+        yaxis = {'title':'Volume (AF)'},
+        paper_bgcolor="#1f2630",
+        plot_bgcolor="#1f2630",
+        font=dict(color="#2cfec1"),
+    )
+
+    nav_layout = go.Layout(
+        height =400,
+        title = 'Navajo Storage',
+        yaxis = {'title':'Volume (AF)'},
+        paper_bgcolor="#1f2630",
+        plot_bgcolor="#1f2630",
+        font=dict(color="#2cfec1"),
+    )
+
+    fg_layout = go.Layout(
+        height =400,
+        title = 'Flaming Gorge Storage',
+        yaxis = {'title':'Volume (AF)'},
+        paper_bgcolor="#1f2630",
+        plot_bgcolor="#1f2630",
+        font=dict(color="#2cfec1"),
+    )
+
+    return {'data': bm_traces, 'layout': bm_layout}, {'data': nav_traces, 'layout': nav_layout}, {'data': fg_traces, 'layout': fg_layout}
 
 @app.callback([
     Output('powell-annual-changes', 'figure'),
