@@ -251,228 +251,92 @@ homepage = html.Div([
     dcc.Store(id='combo-annual-change'),
 ])
 
-# def home_page_App():
-#     return html.Div([
-#         get_header(),
-#         get_navbar('homepage'),
-#         get_emptyrow(),
-
-#         html.Div([
-#             html.Div([
-#                 dcc.Loading(
-#                 id="loading-powell",
-#                 type="default",
-#                 children=html.Div(dcc.Graph(id='powell-levels'))),
-#             ],
-#                 className='four columns'
-#             ),
-#             html.Div([
-#                 dcc.Loading(
-#                 id="loading-mead",
-#                 type="default",
-#                 children=html.Div(dcc.Graph(id='mead-levels'))),
-#             ],
-#                 className='four columns'
-#             ),
-#             html.Div([
-#                 dcc.Loading(
-#                 id="loading-combo",
-#                 type="default",
-#                 children=html.Div(dcc.Graph(id='combo-levels'))),
-#             ],
-#                 className='four columns'
-#             ),
-#         ],
-#             className='row'
-#         ),
-#         html.Div([
-#             html.Div([
-#                 html.H6('Current Storage - AF', style={'text-align': 'center'})
-#             ],
-#                 className='three columns'
-#             ),
-#             html.Div([
-#                 html.H6('Pct. Full', style={'text-align': 'center'})
-#             ],
-#                 className='one column'
-#             ),
-#             html.Div([
-#                 html.H6('24 hr', style={'text-align': 'center'})
-#             ],
-#                 className='one column'
-#             ),
-#             html.Div([
-#                 html.H6('C.Y.', style={'text-align': 'center'})
-#             ],
-#                 className='one column'
-#             ),
-#             html.Div([
-#                 html.H6('Year', style={'text-align': 'center'})
-#             ],
-#                 className='one column'
-#             ),
-#             html.Div([
-#                 html.H6('Rec Low', style={'text-align': 'center'})
-#             ],
-#                 className='one column'
-#             ),
-#             html.Div([
-#                 html.H6('Diff', style={'text-align': 'center'})
-#             ],
-#                 className='one column'
-#             ),
-#             html.Div([
-#                 html.H6('Rec Low Date', style={'text-align': 'center'})
-#             ],
-#                 className='two columns'
-#             ),
-#         ],
-#             className='row'
-#         ),
-#         html.Div([
-#             html.Div(id='cur-levels')
-#         ],
-#             className='row'
-#         ),
-#         html.Div([
-#             html.Div([
-#                 dcc.Graph(
-#                     id='powell-annual-changes'
-#                 )
-#             ],
-#                 className='four columns'
-#             ),
-#             html.Div([
-#                 dcc.Graph(
-#                     id='mead-annual-changes'
-#                 )
-#             ],
-#                 className='four columns'
-#             ),
-#             html.Div([
-#                 dcc.Graph(
-#                     id='combo-annual-changes'
-#                 )
-#             ],
-#                 className='four columns'
-#             ),
-            
-#         ],
-#             className='row'
-#         ),
-#         html.Div([
-#             html.Div([
-#                 dcc.Link(
-#                     html.H6(children='Powell Data'),
-#                     href='/apps/powell'
-#                 )
-#             ],
-#                 className='four columns',
-#                 style={'text-align': 'center'}
-#             ),
-#         ],
-#             className='row'
-#         ),
-#         dcc.Interval(
-#             id='interval-component',
-#             interval=500*1000, # in milliseconds
-#             n_intervals=0
-#         ),
-#         dcc.Store(id='powell-water-data'),
-#         dcc.Store(id='mead-water-data'),
-#         dcc.Store(id='combo-water-data'),
-#         dcc.Store(id='powell-annual-change'),
-#         dcc.Store(id='mead-annual-change'),
-#         dcc.Store(id='combo-annual-change'),
-#     ])
-
-def ur_App():
-    return html.Div([
-        get_header(),
-        get_navbar("non_home"),
-        get_emptyrow(),
-
+layout_ur = html.Div([
+    get_header(),
+    get_navbar('non-home'),
+    get_emptyrow(),
+    html.Div([
         html.Div([
-            html.Div([
-                dcc.Graph(
-                    id='bm-levels',
-                ),
-            ],
-                className='four columns'
+            dcc.Graph(
+                id='bm-levels',
             ),
-            html.Div([
-                dcc.Graph(
-                    id='navajo-levels',
-                ),
-            ],
-                className='four columns'
-            ),
-            html.Div([
-                dcc.Graph(
-                    id='fg-levels',
-                ),
-            ],
-                className='four columns'
-            ),
-
         ],
-            className='row'
+            className='four columns'
         ),
         html.Div([
-            html.Div([
-                html.H6('Current Storage - AF', style={'text-align': 'center'})
-            ],
-                className='three columns'
-            ),
-            html.Div([
-                html.H6('Pct. Full', style={'text-align': 'center'})
-            ],
-                className='one column'
-            ),
-            html.Div([
-                html.H6('24 hr', style={'text-align': 'center'})
-            ],
-                className='one column'
-            ),
-            html.Div([
-                html.H6('C.Y.', style={'text-align': 'center'})
-            ],
-                className='one column'
-            ),
-            html.Div([
-                html.H6('Year', style={'text-align': 'center'})
-            ],
-                className='one column'
-            ),
-            html.Div([
-                html.H6('Rec Low', style={'text-align': 'center'})
-            ],
-                className='one column'
-            ),
-            html.Div([
-                html.H6('Diff', style={'text-align': 'center'})
-            ],
-                className='one column'
-            ),
-            html.Div([
-                html.H6('Rec Low Date', style={'text-align': 'center'})
-            ],
-                className='two columns'
+            dcc.Graph(
+                id='navajo-levels',
             ),
         ],
+            className='four columns'
+        ),
+        html.Div([
+            dcc.Graph(
+                id='fg-levels',
+            ),
+        ],
+            className='four columns'
+        ),
+
+    ],
         className='row'
+    ),
+    html.Div([
+        html.Div([
+            html.H6('Current Storage - AF', style={'text-align': 'center'})
+        ],
+            className='three columns'
         ),
         html.Div([
-            html.Div(id='upper-cur-levels')
+            html.H6('Pct. Full', style={'text-align': 'center'})
         ],
-            className='row'
+            className='one column'
         ),
-        dcc.Interval(
-            id='interval-component',
-            interval=500*1000, # in milliseconds
-            n_intervals=0
+        html.Div([
+            html.H6('24 hr', style={'text-align': 'center'})
+        ],
+            className='one column'
         ),
-    ])
+        html.Div([
+            html.H6('C.Y.', style={'text-align': 'center'})
+        ],
+            className='one column'
+        ),
+        html.Div([
+            html.H6('Year', style={'text-align': 'center'})
+        ],
+            className='one column'
+        ),
+        html.Div([
+            html.H6('Rec Low', style={'text-align': 'center'})
+        ],
+            className='one column'
+        ),
+        html.Div([
+            html.H6('Diff', style={'text-align': 'center'})
+        ],
+            className='one column'
+        ),
+        html.Div([
+            html.H6('Rec Low Date', style={'text-align': 'center'})
+        ],
+            className='two columns'
+        ),
+    ],
+    className='row'
+    ),
+    html.Div([
+        html.Div(id='upper-cur-levels')
+    ],
+        className='row'
+    ),
+    dcc.Interval(
+        id='interval-component',
+        interval=500*1000, # in milliseconds
+        n_intervals=0
+    ),
+
+])
 
 url_bar_and_content_div = html.Div([
     dcc.Location(id='url', refresh=False),
@@ -486,9 +350,9 @@ url_bar_and_content_div = html.Div([
 #     # dcc.Link('Navigate to "/page-2"', href='/page-2'),
 # ])
 
-layout_ur = html.Div([
-    get_header(),
-    ur_App(),
+# layout_ur = html.Div([
+#     get_header(),
+    # ur_App(),
     # dcc.Input(id='input-1-state', type='text', value='Montreal'),
     # dcc.Input(id='input-2-state', type='text', value='Canada'),
     # html.Button(id='submit-button', n_clicks=0, children='Submit'),
@@ -497,7 +361,7 @@ layout_ur = html.Div([
     # dcc.Link('Navigate to "/"', href='/'),
     # html.Br(),
     # dcc.Link('Navigate to "/page-2"', href='/page-2'),
-])
+# ])
 
 app.layout = url_bar_and_content_div
 
@@ -542,26 +406,6 @@ def update_output(n_clicks, input1, input2):
     Output('combo-water-data', 'data')],
     Input('interval-component', 'n_intervals'))
 def clean_powell_data(n):
-
-    # powell_data = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=509&before=' + today + '&after=1999-12-29&filename=Lake%20Powell%20Glen%20Canyon%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20'
-
-    # mead_data = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=6124&before=' + today + '&after=1999-12-30&filename=Lake%20Mead%20Hoover%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20(1937-05-28%20-%202020-11-30)&order=ASC'
-
-
-    # https://data.usbr.gov/rise/api/result/download?type=csv&itemId=509&before=2021-09-22&after=1999-12-29&filename=Lake%20Powell%20Glen%20Canyon%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20
-
-
-    # with requests.Session() as s:
-
-    #     powell_download = s.get(powell_data)
-        
-    #     powell_decoded_content = powell_download.content.decode('utf-8')
-    
-    #     crp = csv.reader(powell_decoded_content.splitlines(), delimiter=',')
-        
-        
-    #     for i in range(9): next(crp)
-    #     df_powell_water = pd.DataFrame(crp)
         
     df_powell_water = powell_data_raw.drop(powell_data_raw.columns[[1,3,4,5,7,8]], axis=1)
     
@@ -575,16 +419,7 @@ def clean_powell_data(n):
    
     df_powell_water = df_powell_water.set_index("Date")
     df_powell_water = df_powell_water.sort_index()
-    print(df_powell_water)
-
-        # mead_download = s.get(mead_data)
-
-        # mead_decoded_content = mead_download.content.decode('utf-8')
-
-        # crm = csv.reader(mead_decoded_content.splitlines(), delimiter=',')
-
-        # for i in range(9): next(crm)
-        # df_mead_water = pd.DataFrame(crm)
+       
     df_mead_water = mead_data_raw.drop(mead_data_raw.columns[[1,3,4,5,7,8]], axis=1)
     df_mead_water.columns = ["Site", "Water Level", "Date"]
     df_mead_water = df_mead_water[7:]
