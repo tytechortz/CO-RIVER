@@ -488,21 +488,6 @@ def clean_powell_data(n):
     fg_df = fg_data_raw
     # print(bm_df)
 
-    # blue_mesa_data = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=76&before=' + today + '&after=1999-12-30&filename=Blue%20Mesa%20Reservoir%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20(2000-01-01%20-%202021-07-14)&order=ASC'
-
-    # navajo_data = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=613&before=' + today + '&after=1999-12-30&filename=Navajo%20Reservoir%20and%20Dam%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20(1999-12-31%20-%202021-07-14)&order=ASC'
-
-    # fg_data = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=337&before=' + today + '&after=1999-12-30&filename=Flaming%20Gorge%20Reservoir%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20(1999-12-31%20-%202021-07-15)&order=ASC'
-
-    # with requests.Session() as s:
-    #     blue_mesa_download = s.get(blue_mesa_data)
-
-    #     blue_mesa_decoded_content = blue_mesa_download.content.decode('utf-8')
-
-    #     crm = csv.reader(blue_mesa_decoded_content.splitlines(), delimiter=',')
-
-    #     for i in range(9): next(crm)
-    #     df_bm_water = pd.DataFrame(crm)
     df_bm_water = bm_df.drop(bm_df.columns[[1,3,4,5,7,8]], axis=1)
     # print(df_nav_water)
     df_bm_water.columns = ["Site", "Value", "Date"]
@@ -512,16 +497,7 @@ def clean_powell_data(n):
 
     df_bm_water = df_bm_water.set_index("Date")
     df_bm_water = df_bm_water.sort_index()
-    # print(df_bm_water)
-
-        # navajo_download = s.get(navajo_data)
-
-        # navajo_decoded_content = navajo_download.content.decode('utf-8')
-
-        # crm = csv.reader(navajo_decoded_content.splitlines(), delimiter=',')
-
-        # for i in range(9): next(crm)
-        # df_nav_water = pd.DataFrame(crm)
+    
     df_nav_water = nav_df.drop(nav_df.columns[[1,3,4,5,7,8]], axis=1)
     
 
@@ -532,14 +508,7 @@ def clean_powell_data(n):
 
     df_nav_water = df_nav_water.set_index("Date")
     df_nav_water = df_nav_water.sort_index()
-    # fg_download = s.get(fg_data)
-
-        # fg_decoded_content = fg_download.content.decode('utf-8')
-
-        # crm = csv.reader(fg_decoded_content.splitlines(), delimiter=',')
-
-        # for i in range(9): next(crm)
-        # df_fg_water = pd.DataFrame(crm)
+   
     df_fg_water = fg_df.drop(fg_df.columns[[1,3,4,5,7,8]], axis=1)
     df_fg_water.columns = ["Site", "Value", "Date"]
 
@@ -556,7 +525,7 @@ def clean_powell_data(n):
     ur_total = pd.merge(blue_mesa_df, navajo_df, how='inner', left_index=True, right_index=True)
 
     ur_total = pd.merge(ur_total, fg_df, how='inner', left_index=True, right_index=True)
-    print(ur_total)
+    # print(ur_total)
 
     return blue_mesa_df.to_json(), navajo_df.to_json(), fg_df.to_json(), ur_total.to_json()
 
