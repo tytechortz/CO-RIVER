@@ -350,6 +350,7 @@ layout_ur = html.Div([
     dcc.Store(id='blue-mesa-water-data'),
     dcc.Store(id='navajo-water-data'),
     dcc.Store(id='fg-water-data'),
+    dcc.Store(id='ur-water-data'),
 
 ])
 
@@ -478,7 +479,8 @@ def clean_powell_data(n):
 @app.callback([
     Output('blue-mesa-water-data', 'data'),
     Output('navajo-water-data', 'data'),
-    Output('fg-water-data', 'data')],
+    Output('fg-water-data', 'data'),
+    Output('ur-water-data', 'data')],
     Input('interval-component', 'n_intervals'))
 def clean_powell_data(n):
     bm_df = blue_mesa_data_raw
@@ -551,8 +553,12 @@ def clean_powell_data(n):
     navajo_df = df_nav_water.drop(df_nav_water.index[0])
     fg_df = df_fg_water.drop(df_fg_water.index[0])
 
+    ur_total = pd.merge(blue_mesa_df, navajo_df, how='inner', left_index=True, right_index=True)
 
-    return blue_mesa_df.to_json(), navajo_df.to_json(), fg_df.to_json()
+    ur_total = pd.merge(ur_total, fg_df, how='inner', left_index=True, right_index=True)
+    print(ur_total)
+
+    return blue_mesa_df.to_json(), navajo_df.to_json(), fg_df.to_json(), ur_total.to_json()
 
 
 #################### GRAPH CALLBACKS ################################
