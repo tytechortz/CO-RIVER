@@ -27,7 +27,7 @@ f_date = datetime(year, 1, 1)
 delta = today2 - f_date
 days = delta.days
 
-capacities = {'Lake Powell Glen Canyon Dam and Powerplant': 24322000, 'Lake Mead Hoover Dam and Powerplant': 26134000, 'FLAMING GORGE RESERVOIR': 3788700, 'NAVAJO RESERVOIR': 1708600, 'BLUE MESA RESERVOIR': 940800, 'Powell Mead Combo': 50456000}
+capacities = {'Lake Powell Glen Canyon Dam and Powerplant': 24322000, 'Lake Mead Hoover Dam and Powerplant': 26134000, 'FLAMING GORGE RESERVOIR': 3788700, 'NAVAJO RESERVOIR': 1708600, 'BLUE MESA RESERVOIR': 940800, 'Powell Mead Combo': 50456000, 'UR': 6438100}
 
 powell_data_url= 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=509&before=' + today + '&after=1999-12-29&filename=Lake%20Powell%20Glen%20Canyon%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20'
 
@@ -1028,6 +1028,7 @@ def get_current_volumes_upper(bm_data, nav_data, fg_data, ur_data):
     ur_data['Storage'] = ur_data['Value_x'] + ur_data['Value_y'] + ur_data['Value']
     print(ur_data)
     ur_current_volume = ur_data['Storage'].iloc[-1]
+    ur_pct = ur_current_volume / capacities['UR']
 
 
     return html.Div([
@@ -1190,7 +1191,7 @@ def get_current_volumes_upper(bm_data, nav_data, fg_data, ur_data):
                 className='one column'
             ),
             html.Div([
-                html.H6('{0:.1%}'.format(fg_pct), style={'text-align': 'center'})
+                html.H6('{0:.1%}'.format(ur_pct), style={'text-align': 'center'})
             ],
                 className='one column'
             ),
@@ -1230,4 +1231,4 @@ def get_current_volumes_upper(bm_data, nav_data, fg_data, ur_data):
     ])
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(port=8000, debug=True)
