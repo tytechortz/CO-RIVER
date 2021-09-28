@@ -1027,6 +1027,7 @@ def get_current_volumes_upper(bm_data, nav_data, fg_data, ur_data):
     print(ur_data)
     ur_data['Storage'] = ur_data['Value_x'] + ur_data['Value_y'] + ur_data['Value']
     print(ur_data)
+    ur_current_volume = ur_data['Storage'].iloc[-1]
 
 
     return html.Div([
@@ -1184,7 +1185,7 @@ def get_current_volumes_upper(bm_data, nav_data, fg_data, ur_data):
                 className = 'two columns'
             ),
             html.Div([
-                html.H6('{:,.0f}'.format(fg_current_volume), style={'text-align': 'right'})
+                html.H6('{:,.0f}'.format(ur_current_volume), style={'text-align': 'right'})
             ],
                 className='one column'
             ),
@@ -1212,6 +1213,16 @@ def get_current_volumes_upper(bm_data, nav_data, fg_data, ur_data):
                 html.H6('{:,.0f}'.format(fg_rec_low), style={'text-align': 'center'})
             ],
                 className='one column'
+            ),
+            html.Div([
+                html.H6('{:,.0f}'.format(fg_dif_rl), style={'text-align': 'center'})
+            ],
+                className='one column'
+            ),
+            html.Div([
+                html.H6('{}'.format(fg_rec_low_date), style={'text-align': 'center'})
+            ],
+                className='two columns'
             ),
         ],
             className = 'row'
