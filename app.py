@@ -39,16 +39,17 @@ navajo_data_url = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemI
 
 fg_data_url = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=337&before=' + today + '&after=1999-12-30&filename=Flaming%20Gorge%20Reservoir%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20(1999-12-31%20-%202021-07-15)&order=ASC'
 
-drought_data_url = 'https://usdmdataservices.unl.edu/api/StateStatistics/GetDroughtSeverityStatisticsByAreaPercent?aoi=08&startdate=1/1/2000&enddate=' + today + '&statisticsType=2'
+# drought_data_url = 'https://usdmdataservices.unl.edu/api/StateStatistics/GetDroughtSeverityStatisticsByAreaPercent?aoi=08&startdate=1/1/2000&enddate=' + today + '&statisticsType=2'
+
 
 powell_data_raw = pd.read_csv(powell_data_url)
 mead_data_raw = pd.read_csv(mead_data_url)
 blue_mesa_data_raw = pd.read_csv(blue_mesa_data_url)
 navajo_data_raw = pd.read_csv(navajo_data_url)
 fg_data_raw = pd.read_csv(fg_data_url)
-drought_data_raw = pd.read_csv(drought_data_url)
+# drought_data_raw = pd.read_csv(drought_data_url)
 # print(blue_mesa_data_raw)
-
+# print(mead_data_raw)
 def get_header():
 
     header = html.Div([
@@ -526,6 +527,7 @@ def clean_powell_data(n):
 
     ur_total = pd.merge(ur_total, fg_df, how='inner', left_index=True, right_index=True)
     # print(ur_total)
+    # ur_total['Water Level'] = ur_total[]
 
     return blue_mesa_df.to_json(), navajo_df.to_json(), fg_df.to_json(), ur_total.to_json()
 
@@ -984,8 +986,9 @@ def get_current_volumes(powell_data, mead_data, combo_data, n):
     Output('upper-cur-levels', 'children'),
     [Input('blue-mesa-water-data', 'data'),
     Input('navajo-water-data', 'data'),
-    Input('fg-water-data', 'data')])
-def get_current_volumes_upper(bm_data, nav_data, fg_data):
+    Input('fg-water-data', 'data'),
+    Input('ur-water-data', 'data')])
+def get_current_volumes_upper(bm_data, nav_data, fg_data, ur_data):
     bm_data = pd.read_json(bm_data)
     bm_data.sort_index()
     bm_current_volume = bm_data.iloc[-1,1]
@@ -1019,6 +1022,12 @@ def get_current_volumes_upper(bm_data, nav_data, fg_data):
     fg_rec_low = fg_data['Value'].min()
     fg_dif_rl = fg_data['Value'].iloc[-1] - fg_rec_low
     fg_rec_low_date = fg_data['Value'].idxmin().strftime('%Y-%m-%d')
+
+    ur_data = pd.read_json(ur_data)
+    print(ur_data)
+    ur_data['Storage'] = ur_data['Value_x'] + ur_data['Value_y'] + ur_data['Value']
+    print(ur_data)
+
 
     return html.Div([
         html.Div([
@@ -1164,6 +1173,45 @@ def get_current_volumes_upper(bm_data, nav_data, fg_data):
                 html.H6('{}'.format(fg_rec_low_date), style={'text-align': 'center'})
             ],
                 className='two columns'
+            ),
+        ],
+            className = 'row'
+        ),
+        html.Div([
+            html.Div([
+                html.H6('Combined', style={'text-align': 'left'})
+            ],
+                className = 'two columns'
+            ),
+            html.Div([
+                html.H6('{:,.0f}'.format(fg_current_volume), style={'text-align': 'right'})
+            ],
+                className='one column'
+            ),
+            html.Div([
+                html.H6('{0:.1%}'.format(fg_pct), style={'text-align': 'center'})
+            ],
+                className='one column'
+            ),
+            html.Div([
+                html.H6('{:,.0f}'.format(fg_tfh_change), style={'text-align': 'center'})
+            ],
+                className='one column'
+            ),
+            html.Div([
+                html.H6('{:,.0f}'.format(fg_cy), style={'text-align': 'center'})
+            ],
+                className='one column'
+            ),
+            html.Div([
+                html.H6('{:,.0f}'.format(fg_yr), style={'text-align': 'center'})
+            ],
+                className='one column'
+            ),
+            html.Div([
+                html.H6('{:,.0f}'.format(fg_rec_low), style={'text-align': 'center'})
+            ],
+                className='one column'
             ),
         ],
             className = 'row'
