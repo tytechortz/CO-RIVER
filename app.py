@@ -783,7 +783,7 @@ def drought_graph(combo_data, data):
     drought_traces = []
 
     df_combo = pd.read_json(combo_data)
-    
+    df_combo['color'] = np.where(df_combo.index.year % 2 == 1, 'red', 'green')
 
     drought_traces.append(go.Scatter(
         y = df['MA'],
@@ -795,7 +795,7 @@ def drought_graph(combo_data, data):
         y = df_combo['Water Level'],
         x = df_combo.index,
         yaxis ='y2',
-        marker_color = 'lightblue'
+        marker_color = df_combo['color']
     )),
 
     drought_layout = go.Layout(
