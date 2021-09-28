@@ -437,6 +437,7 @@ layout_drought = html.Div([
     ),
     dcc.Store(id='drought-data'),
     dcc.Store(id='combo-water-data'),
+    dcc.Store(id='combo-annual-change'),
 ])
 
 url_bar_and_content_div = html.Div([
@@ -776,14 +777,27 @@ def lake_graph(bm_data, nav_data, fg_data):
     Input('drought-data', 'data')])
 def drought_graph(combo_data, data):
     df = pd.read_json(data)
+    # df_last = pd.read_json(last)
+    # print(df_last)
     df['MA'] = df['DSCI'].rolling(window=10).mean()
-    print(df)
+    # print(df)
 
 
     drought_traces = []
 
     df_combo = pd.read_json(combo_data)
-    df_combo['color'] = np.where(df_combo.index.year % 2 == 1, 'red', 'green')
+    df_combo['color'] = np.where(df_combo.index.year % 2 == 1, 'lightblue', 'aqua')
+    df_combo_last = df_combo.groupby(df_combo.index.strftime('%Y')).tail(1)
+    df_combo_last['diff'] = df_combo_last['Water Level'].diff()
+
+    print(df_combo_last)
+    #adi = annual dsci average
+
+    df_ada = df[['DSCI']]
+    df_ada = df_ada.groupby(df_ada.index.strftime('%Y'))['DSCI'].mean()
+    print(df_ada)
+    # df_combo_last['diff'] = df_combo_last[]
+
 
     drought_traces.append(go.Scatter(
         y = df['MA'],
