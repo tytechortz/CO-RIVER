@@ -1029,6 +1029,7 @@ def get_current_volumes_upper(bm_data, nav_data, fg_data, ur_data):
     print(ur_data)
     ur_current_volume = ur_data['Storage'].iloc[-1]
     ur_pct = ur_current_volume / capacities['UR']
+    ur_tfh_change = ur_current_volume - ur_data['Storage'][-2]
 
 
     return html.Div([
@@ -1196,7 +1197,7 @@ def get_current_volumes_upper(bm_data, nav_data, fg_data, ur_data):
                 className='one column'
             ),
             html.Div([
-                html.H6('{:,.0f}'.format(fg_tfh_change), style={'text-align': 'center'})
+                html.H6('{:,.0f}'.format(ur_tfh_change), style={'text-align': 'center'})
             ],
                 className='one column'
             ),
