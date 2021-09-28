@@ -39,7 +39,7 @@ navajo_data_url = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemI
 
 fg_data_url = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=337&before=' + today + '&after=1999-12-30&filename=Flaming%20Gorge%20Reservoir%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20(1999-12-31%20-%202021-07-15)&order=ASC'
 
-# drought_data_url = 'https://usdmdataservices.unl.edu/api/StateStatistics/GetDroughtSeverityStatisticsByAreaPercent?aoi=08&startdate=1/1/2000&enddate=' + today + '&statisticsType=2'
+drought_data_url = 'https://usdmdataservices.unl.edu/api/StateStatistics/GetDroughtSeverityStatisticsByAreaPercent?aoi=08&startdate=1/1/2000&enddate=' + today + '&statisticsType=2'
 
 
 powell_data_raw = pd.read_csv(powell_data_url)
@@ -47,7 +47,7 @@ mead_data_raw = pd.read_csv(mead_data_url)
 blue_mesa_data_raw = pd.read_csv(blue_mesa_data_url)
 navajo_data_raw = pd.read_csv(navajo_data_url)
 fg_data_raw = pd.read_csv(fg_data_url)
-# drought_data_raw = pd.read_csv(drought_data_url)
+drought_data_raw = pd.read_csv(drought_data_url)
 # print(blue_mesa_data_raw)
 # print(mead_data_raw)
 def get_header():
@@ -355,6 +355,12 @@ layout_ur = html.Div([
 
 ])
 
+layout_drought = html.Div([
+    get_header(),
+    get_navbar('non-home'),
+    get_emptyrow()
+])
+
 url_bar_and_content_div = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
@@ -387,7 +393,7 @@ app.validation_layout = html.Div([
     url_bar_and_content_div,
     homepage,
     layout_ur,
-    # layout_page_2,
+    layout_drought,
 ])
 
 # Index callbacks
@@ -398,8 +404,8 @@ def display_page(pathname):
         return homepage
     elif pathname == "/ur":
         return layout_ur
-    elif pathname == "/page-2":
-        return layout_page_2
+    elif pathname == "/drought":
+        return layout_drought
     else:
         return homepage
 
