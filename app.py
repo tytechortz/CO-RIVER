@@ -41,9 +41,25 @@ fg_data_url = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=33
 
 drought_data_url = 'https://usdmdataservices.unl.edu/api/StateStatistics/GetDroughtSeverityStatisticsByAreaPercent?aoi=08&startdate=1/1/2000&enddate=' + today + '&statisticsType=2'
 
+@app.callback(
+    Output('powell-water-data-raw', 'data'),
+    Input('interval-component', 'n_intervals'))
+def get_powell_data(n):
+    powell_data_raw = pd.read_csv(powell_data_url)
+    # print(powell_data_raw)
+    return powell_data_raw.to_json()
 
-powell_data_raw = pd.read_csv(powell_data_url)
-mead_data_raw = pd.read_csv(mead_data_url)
+@app.callback(
+    Output('mead-water-data-raw', 'data'),
+    Input('interval-component', 'n_intervals'))
+def get_mead_data(n):
+    mead_data_raw = pd.read_csv(mead_data_url)
+    # print(powell_data_raw)
+    return mead_data_raw.to_json()
+
+
+# powell_data_raw = pd.read_csv(powell_data_url)
+# mead_data_raw = pd.read_csv(mead_data_url)
 blue_mesa_data_raw = pd.read_csv(blue_mesa_data_url)
 navajo_data_raw = pd.read_csv(navajo_data_url)
 fg_data_raw = pd.read_csv(fg_data_url)
@@ -257,7 +273,9 @@ homepage = html.Div([
         n_intervals=0
     ),
     dcc.Store(id='powell-water-data'),
+    dcc.Store(id='powell-water-data-raw'),
     dcc.Store(id='mead-water-data'),
+    dcc.Store(id='mead-water-data-raw'),
     dcc.Store(id='combo-water-data'),
     dcc.Store(id='powell-annual-change'),
     dcc.Store(id='mead-annual-change'),
@@ -358,7 +376,24 @@ layout_ur = html.Div([
 layout_drought = html.Div([
     get_header(),
     get_navbar('non-home'),
-    get_emptyrow()
+    get_emptyrow(),
+    html.Div([
+        html.H2(
+            'Drought',
+            className='twelve columns',
+            style={'text-align': 'center'}
+        )
+    ],
+        className='row'
+    ),
+    html.Div([
+        dcc.Graph(
+            id='drought-graph'
+        )
+    ],  
+        className='row'
+    ),
+    dcc.Store(id='drought-data'),
 ])
 
 url_bar_and_content_div = html.Div([
@@ -427,10 +462,13 @@ def update_output(n_clicks, input1, input2):
     Output('powell-water-data', 'data'),
     Output('mead-water-data', 'data'),
     Output('combo-water-data', 'data')],
-    Input('interval-component', 'n_intervals'))
-def clean_powell_data(n):
-        
-    df_powell_water = powell_data_raw.drop(powell_data_raw.columns[[1,3,4,5,7,8]], axis=1)
+    [Input('interval-component', 'n_intervals'),
+    Input('powell-water-data-raw', 'data'),
+    Input('mead-water-data-raw', 'data')])
+def clean_powell_data(n, powell_data_raw, mead_data_raw):
+    df_powell_water = pd.read_json(powell_data_raw)
+    print(df_powell_water)
+    df_powell_water = df_powell_water.drop(df_powell_water.columns[[1,3,4,5,7,8]], axis=1)
     
     df_powell_water.columns = ["Site", "Water Level", "Date"]
     
@@ -443,7 +481,9 @@ def clean_powell_data(n):
     df_powell_water = df_powell_water.set_index("Date")
     df_powell_water = df_powell_water.sort_index()
        
-    df_mead_water = mead_data_raw.drop(mead_data_raw.columns[[1,3,4,5,7,8]], axis=1)
+
+    df_mead_water = pd.read_json(mead_data_raw)
+    df_mead_water = df_mead_water.drop(df_mead_water.columns[[1,3,4,5,7,8]], axis=1)
     df_mead_water.columns = ["Site", "Water Level", "Date"]
     df_mead_water = df_mead_water[7:]
     
