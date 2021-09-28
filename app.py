@@ -39,7 +39,9 @@ navajo_data_url = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemI
 
 fg_data_url = 'https://data.usbr.gov/rise/api/result/download?type=csv&itemId=337&before=' + today + '&after=1999-12-30&filename=Flaming%20Gorge%20Reservoir%20Dam%20and%20Powerplant%20Daily%20Lake%2FReservoir%20Storage-af%20Time%20Series%20Data%20(1999-12-31%20-%202021-07-15)&order=ASC'
 
-drought_data_url = 'https://usdmdataservices.unl.edu/api/StateStatistics/GetDroughtSeverityStatisticsByAreaPercent?aoi=08&startdate=1/1/2000&enddate=' + today + '&statisticsType=2'
+# drought_data_url = 'https://usdmdataservices.unl.edu/api/StateStatistics/GetDroughtSeverityStatisticsByAreaPercent?aoi=08&startdate=1/1/2000&enddate=' + today + '&statisticsType=2'
+
+# https://usdmdataservices.unl.edu/api/StateStatistics/GetDroughtSeverityStatisticsByAreaPercent?aoi=08&startdate=1/1/2000&enddate=2021/9/28&statisticsType=2
 
 @app.callback(
     Output('powell-water-data-raw', 'data'),
@@ -57,15 +59,50 @@ def get_mead_data(n):
     # print(powell_data_raw)
     return mead_data_raw.to_json()
 
+# @app.callback(
+#     Output('drought-data-raw', 'data'),
+#     Input('interval-component', 'n_intervals'))
+# def get_drought_data(n):
+#     df = pd.read_csv(drought_data_url)
+#     # df = pd.read_json(io.StringIO(drought_data_url.decode('utf-8')))
+#     df.drop(['StatisticFormatID', 'StateAbbreviation', 'MapDate'] , axis=1, inplace=True)
+#     df.set_index('date', inplace=True)
+#     print(df)
+#     df['DSCI'] = (df['D0'] + (df['D1']*2) + (df['D2']*3) + (df['D3']*4 + (df['D4']*5)))
+#     df = df.sort_index(ascending=True)
+#     df['MA'] = df['DSCI'].rolling(window=10).mean()
+#     return df.to_json()
+@app.callback(
+    Output('drought-data', 'data'),
+    Input('interval-component', 'n_intervals'))
+def data(n):
+    url = 'https://usdmdataservices.unl.edu/api/StateStatistics/GetDroughtSeverityStatisticsByAreaPercent?aoi=08&startdate=1/1/2000&enddate=' + today + '&statisticsType=2'
+
+    # combo_data = pd.read_json(com)
+    # print(combo_data)
+    r = requests.get(url).content
+
+    df = pd.read_json(io.StringIO(r.decode('utf-8')))
+    # print(df)
+
+    df['date'] = pd.to_datetime(df['MapDate'].astype(str), format='%Y%m%d')
+
+    df.drop(['StatisticFormatID', 'StateAbbreviation', 'MapDate'] , axis=1, inplace=True)
+    df.set_index('date', inplace=True)
+    # print(df)
+    df['DSCI'] = (df['D0'] + (df['D1']*2) + (df['D2']*3) + (df['D3']*4 + (df['D4']*5)))
+    # print(df)
+    return df.to_json()
+
 
 # powell_data_raw = pd.read_csv(powell_data_url)
 # mead_data_raw = pd.read_csv(mead_data_url)
 blue_mesa_data_raw = pd.read_csv(blue_mesa_data_url)
 navajo_data_raw = pd.read_csv(navajo_data_url)
 fg_data_raw = pd.read_csv(fg_data_url)
-drought_data_raw = pd.read_csv(drought_data_url)
+# drought_data_raw = pd.read_csv(drought_data_url)
 # print(blue_mesa_data_raw)
-# print(mead_data_raw)
+# print(drought_data_raw)
 def get_header():
 
     header = html.Div([
@@ -393,7 +430,13 @@ layout_drought = html.Div([
     ],  
         className='row'
     ),
+    dcc.Interval(
+        id='interval-component',
+        interval=500*1000, # in milliseconds
+        n_intervals=0
+    ),
     dcc.Store(id='drought-data'),
+    dcc.Store(id='combo-water-data'),
 ])
 
 url_bar_and_content_div = html.Div([
@@ -467,7 +510,7 @@ def update_output(n_clicks, input1, input2):
     Input('mead-water-data-raw', 'data')])
 def clean_powell_data(n, powell_data_raw, mead_data_raw):
     df_powell_water = pd.read_json(powell_data_raw)
-    print(df_powell_water)
+    # print(df_powell_water)
     df_powell_water = df_powell_water.drop(df_powell_water.columns[[1,3,4,5,7,8]], axis=1)
     
     df_powell_water.columns = ["Site", "Water Level", "Date"]
@@ -726,6 +769,48 @@ def lake_graph(bm_data, nav_data, fg_data):
     )
 
     return {'data': bm_traces, 'layout': bm_layout}, {'data': nav_traces, 'layout': nav_layout}, {'data': fg_traces, 'layout': fg_layout}
+
+@app.callback(
+    Output('drought-graph', 'figure'),
+    [Input('combo-water-data', 'data'),
+    Input('drought-data', 'data')])
+def drought_graph(combo_data, data):
+    df = pd.read_json(data)
+    df['MA'] = df['DSCI'].rolling(window=10).mean()
+    print(df)
+
+
+    drought_traces = []
+
+    df_combo = pd.read_json(combo_data)
+    
+
+    drought_traces.append(go.Scatter(
+        y = df['MA'],
+        x = df.index,
+        marker_color = 'red',
+        yaxis='y'
+    )),
+    drought_traces.append(go.Bar(
+        y = df_combo['Water Level'],
+        x = df_combo.index,
+        yaxis ='y2',
+        marker_color = 'lightblue'
+    )),
+
+    drought_layout = go.Layout(
+        height =600,
+        title = 'DSCI',
+        yaxis = {'title':'DSCI', 'overlaying': 'y2'},
+        yaxis2 = {'title': 'MAF', 'side': 'right'},
+        paper_bgcolor="#1f2630",
+        plot_bgcolor="#1f2630",
+        font=dict(color="#2cfec1"),
+    )
+
+    return {'data': drought_traces, 'layout': drought_layout}
+
+#################### ANNUAL CHAANGE DATA ###############
 
 @app.callback([
     Output('powell-annual-changes', 'figure'),
