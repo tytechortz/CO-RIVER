@@ -1032,6 +1032,9 @@ def get_current_volumes_upper(bm_data, nav_data, fg_data, ur_data):
     ur_tfh_change = ur_current_volume - ur_data['Storage'][-2]
     ur_cy = ur_current_volume - ur_data['Storage'][-days]
     ur_yr = ur_current_volume - ur_data['Storage'][-366]
+    ur_rec_low = ur_data['Storage'].min()
+    ur_dif_rl = ur_data['Storage'].iloc[-1] - ur_rec_low
+    ur_rec_low_date = ur_data['Storage'].idxmin().strftime('%Y-%m-%d')
  
 
     return html.Div([
@@ -1214,17 +1217,17 @@ def get_current_volumes_upper(bm_data, nav_data, fg_data, ur_data):
                 className='one column'
             ),
             html.Div([
-                html.H6('{:,.0f}'.format(fg_rec_low), style={'text-align': 'center'})
+                html.H6('{:,.0f}'.format(ur_rec_low), style={'text-align': 'center'})
             ],
                 className='one column'
             ),
             html.Div([
-                html.H6('{:,.0f}'.format(fg_dif_rl), style={'text-align': 'center'})
+                html.H6('{:,.0f}'.format(ur_dif_rl), style={'text-align': 'center'})
             ],
                 className='one column'
             ),
             html.Div([
-                html.H6('{}'.format(fg_rec_low_date), style={'text-align': 'center'})
+                html.H6('{}'.format(ur_rec_low_date), style={'text-align': 'center'})
             ],
                 className='two columns'
             ),
