@@ -430,6 +430,14 @@ layout_drought = html.Div([
     ],  
         className='row'
     ),
+    get_emptyrow(),
+    html.Div([
+        dcc.Graph(
+            id='dsci-diff-graph'
+        )
+    ],  
+        className='row'
+    ),
     dcc.Interval(
         id='interval-component',
         interval=500*1000, # in milliseconds
@@ -771,8 +779,9 @@ def lake_graph(bm_data, nav_data, fg_data):
 
     return {'data': bm_traces, 'layout': bm_layout}, {'data': nav_traces, 'layout': nav_layout}, {'data': fg_traces, 'layout': fg_layout}
 
-@app.callback(
+@app.callback([
     Output('drought-graph', 'figure'),
+    Output('dsci-diff-graph', 'figure')],
     [Input('combo-water-data', 'data'),
     Input('drought-data', 'data')])
 def drought_graph(combo_data, data):
@@ -784,6 +793,7 @@ def drought_graph(combo_data, data):
 
 
     drought_traces = []
+    dsci_diff_traces = []
 
     df_combo = pd.read_json(combo_data)
     df_combo['color'] = np.where(df_combo.index.year % 2 == 1, 'lightblue', 'aqua')
@@ -813,7 +823,7 @@ def drought_graph(combo_data, data):
     )),
 
     drought_layout = go.Layout(
-        height =600,
+        height = 600,
         title = 'DSCI',
         yaxis = {'title':'DSCI', 'overlaying': 'y2'},
         yaxis2 = {'title': 'MAF', 'side': 'right'},
@@ -822,7 +832,26 @@ def drought_graph(combo_data, data):
         font=dict(color="#2cfec1"),
     )
 
-    return {'data': drought_traces, 'layout': drought_layout}
+    dsci_diff_traces.append(go.Bar(
+        y = df_ada,
+        x = df_ada.index,
+    )),
+
+    dsci_diff_layout = go.Layout(
+        height = 600,
+        title = 'DSCI',
+        paper_bgcolor="#1f2630",
+        plot_bgcolor="#1f2630",
+        font=dict(color="#2cfec1"),
+    )
+
+    return {'data': drought_traces, 'layout': drought_layout}, {'data': dsci_diff_traces, 'layout': dsci_diff_layout}
+
+# @app.callback(
+#     Output('drought-graph', 'figure'),
+#     [Input('combo-water-data', 'data'),
+#     Input('drought-data', 'data')])
+# def dsci_diff_graph(combo_data, data):
 
 #################### ANNUAL CHAANGE DATA ###############
 
