@@ -821,6 +821,7 @@ def drought_graph(combo_data, data):
     df_combo['color'] = np.where(df_combo.index.year % 2 == 1, 'lightblue', 'aqua')
     df_combo_last = df_combo.groupby(df_combo.index.strftime('%Y')).tail(1)
     df_combo_last['diff'] = df_combo_last['Water Level'].diff()
+    df_combo_last['diff'] = df_combo_last['diff'].apply(lambda x: x*-1)
 
     print(df_combo_last)
     #adi = annual dsci average
@@ -856,7 +857,7 @@ def drought_graph(combo_data, data):
         font=dict(color="#2cfec1"),
     )
 
-    dsci_traces.append(go.Bar(
+    dsci_traces.append(go.Scatter(
         y=df_combo_last['diff'],
         x=df_combo_last.index,
         yaxis='y',
@@ -864,19 +865,19 @@ def drought_graph(combo_data, data):
     )),
 
     dsci_traces.append(go.Bar(
-        y = df_ada,
-        x = df_ada.index,
+        y=df_ada,
+        x=df_ada.index,
         yaxis='y2',
-        marker_color = 'blue',
+        marker_color='blue',
     )),
 
     
 
     dsci_layout = go.Layout(
-        height = 500,
-        title = 'DSCI',
-        yaxis = {'title':'DSCI', 'overlaying': 'y2'},
-        yaxis2 = {'title': 'MAF', 'side': 'right'},
+        height= 500,
+        title='DSCI',
+        yaxis={'title':'DSCI', 'overlaying': 'y2'},
+        yaxis2={'title': 'MAF', 'side': 'right'},
         paper_bgcolor="#1f2630",
         plot_bgcolor="#1f2630",
         font=dict(color="#2cfec1"),
