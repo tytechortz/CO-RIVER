@@ -424,17 +424,37 @@ layout_drought = html.Div([
         className='row'
     ),
     html.Div([
-        dcc.Graph(
-            id='drought-graph'
-        )
+        html.Div([
+            dcc.Graph(
+                id='drought-graph'
+            )
+        ],
+            className='eight columns'
+        ), 
     ],  
         className='row'
     ),
     get_emptyrow(),
     html.Div([
-        dcc.Graph(
-            id='dsci-diff-graph'
-        )
+        html.Div([
+            dcc.Graph(
+                id='dsci-graph'
+            )
+        ],
+            className='eight columns'
+        ), 
+    ],  
+        className='row'
+    ),
+    # get_emptyrow(),
+    html.Div([
+        html.Div([
+            dcc.Graph(
+                id='diff-graph'
+            )
+        ],
+            className='eight columns'
+        ), 
     ],  
         className='row'
     ),
@@ -781,7 +801,8 @@ def lake_graph(bm_data, nav_data, fg_data):
 
 @app.callback([
     Output('drought-graph', 'figure'),
-    Output('dsci-diff-graph', 'figure')],
+    Output('dsci-graph', 'figure'),
+    Output('diff-graph', 'figure'),],
     [Input('combo-water-data', 'data'),
     Input('drought-data', 'data')])
 def drought_graph(combo_data, data):
@@ -793,7 +814,8 @@ def drought_graph(combo_data, data):
 
 
     drought_traces = []
-    dsci_diff_traces = []
+    dsci_traces = []
+    diff_traces = []
 
     df_combo = pd.read_json(combo_data)
     df_combo['color'] = np.where(df_combo.index.year % 2 == 1, 'lightblue', 'aqua')
@@ -810,20 +832,48 @@ def drought_graph(combo_data, data):
 
 
     drought_traces.append(go.Scatter(
-        y = df['MA'],
-        x = df.index,
+        name='DSCI Mov. Avg.',
+        y=df['MA'],
+        x=df.index,
         marker_color = 'red',
         yaxis='y'
     )),
     drought_traces.append(go.Bar(
-        y = df_combo['Water Level'],
-        x = df_combo.index,
-        yaxis ='y2',
-        marker_color = df_combo['color']
+        name='Volume',
+        y=df_combo['Water Level'],
+        x=df_combo.index,
+        yaxis='y2',
+        marker_color=df_combo['color']
     )),
 
     drought_layout = go.Layout(
-        height = 600,
+        height=500,
+        title='DSCI and Total Storage',
+        yaxis={'title':'DSCI', 'overlaying': 'y2'},
+        yaxis2={'title': 'MAF', 'side': 'right'},
+        paper_bgcolor="#1f2630",
+        plot_bgcolor="#1f2630",
+        font=dict(color="#2cfec1"),
+    )
+
+    dsci_traces.append(go.Bar(
+        y=df_combo_last['diff'],
+        x=df_combo_last.index,
+        yaxis='y',
+        marker_color='red',
+    )),
+
+    dsci_traces.append(go.Bar(
+        y = df_ada,
+        x = df_ada.index,
+        yaxis='y2',
+        marker_color = 'blue',
+    )),
+
+    
+
+    dsci_layout = go.Layout(
+        height = 500,
         title = 'DSCI',
         yaxis = {'title':'DSCI', 'overlaying': 'y2'},
         yaxis2 = {'title': 'MAF', 'side': 'right'},
@@ -832,20 +882,17 @@ def drought_graph(combo_data, data):
         font=dict(color="#2cfec1"),
     )
 
-    dsci_diff_traces.append(go.Bar(
-        y = df_ada,
-        x = df_ada.index,
-    )),
-
-    dsci_diff_layout = go.Layout(
-        height = 600,
+    diff_layout = go.Layout(
+        height = 500,
         title = 'DSCI',
+        yaxis = {'title':'DSCI', 'overlaying': 'y2'},
+        yaxis2 = {'title': 'MAF', 'side': 'right'},
         paper_bgcolor="#1f2630",
         plot_bgcolor="#1f2630",
         font=dict(color="#2cfec1"),
     )
 
-    return {'data': drought_traces, 'layout': drought_layout}, {'data': dsci_diff_traces, 'layout': dsci_diff_layout}
+    return {'data': drought_traces, 'layout': drought_layout}, {'data': dsci_traces, 'layout': dsci_layout}, {'data': diff_traces, 'layout': diff_layout}
 
 # @app.callback(
 #     Output('drought-graph', 'figure'),
