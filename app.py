@@ -1,5 +1,6 @@
 import dash
 from dash import html, dcc
+import dash_daq as daq
 from dash.dependencies import Input, Output, State
 import plotly.express as px
 import plotly.graph_objs as go
@@ -431,6 +432,14 @@ layout_drought = html.Div([
         ],
             className='eight columns'
         ), 
+        html.Div([
+            daq.NumericInput(
+                id='our-numeric-input',
+                value=0
+            ),
+        ],
+            className='one column'
+        ),
     ],  
         className='row'
     ),
@@ -749,7 +758,7 @@ def lake_graph(bm_data, nav_data, fg_data):
     bm_df = pd.read_json(bm_data)
     nav_df = pd.read_json(nav_data)
     fg_df = pd.read_json(fg_data)
-    # print(bm_df)
+    print(fg_df)
 
     bm_traces = []
     nav_traces = []
@@ -828,7 +837,7 @@ def drought_graph(combo_data, data):
 
     df_ada = df[['DSCI']]
     df_ada = df_ada.groupby(df_ada.index.strftime('%Y'))['DSCI'].mean()
-    print(df_ada)
+    # print(df_ada)
     # df_combo_last['diff'] = df_combo_last[]
 
 
@@ -858,15 +867,19 @@ def drought_graph(combo_data, data):
     )
 
     dsci_traces.append(go.Scatter(
+        name='Negative Vol.Change',
         y=df_combo_last['diff'],
         x=df_combo_last.index,
         yaxis='y',
         marker_color='red',
+        # opacity=0.5,
+        # width=2
     )),
 
     dsci_traces.append(go.Bar(
+        name='DSCI Annual Mean',
         y=df_ada,
-        x=df_ada.index,
+        x=df_combo_last.index,
         yaxis='y2',
         marker_color='blue',
     )),
@@ -875,9 +888,9 @@ def drought_graph(combo_data, data):
 
     dsci_layout = go.Layout(
         height= 500,
-        title='DSCI',
-        yaxis={'title':'DSCI', 'overlaying': 'y2'},
-        yaxis2={'title': 'MAF', 'side': 'right'},
+        title='Mean DSCI and Negative Volume Change',
+        yaxis={'title':'MAF', 'overlaying': 'y2'},
+        yaxis2={'title': 'DSCI', 'side': 'right'},
         paper_bgcolor="#1f2630",
         plot_bgcolor="#1f2630",
         font=dict(color="#2cfec1"),
