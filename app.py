@@ -820,6 +820,7 @@ def drought_graphs(combo_data, data, ma_value):
     df = pd.read_json(data)
     # df_last = pd.read_json(last)
     # print(df_last)
+
     df['MA'] = df['DSCI'].rolling(window=ma_value).mean()
     # print(df)
 
@@ -872,6 +873,8 @@ def drought_graphs(combo_data, data, ma_value):
         name='Negative Vol.Change',
         y=df_combo_last['diff'],
         x=df_combo_last.index,
+        mode='markers',
+        marker_size=10,
         yaxis='y',
         marker_color='red',
         # opacity=0.5,
