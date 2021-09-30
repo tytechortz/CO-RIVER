@@ -441,7 +441,26 @@ layout_drought = html.Div([
         ],
             className='one column'
         ),
+        html.Div([
+            html.H1('STATS'),
+        ],
+            className='three columns'
+        ),
     ],  
+        className='row'
+    ),
+    html.Div([
+        html.Div([], className='one column'),
+        html.Div([
+            dcc.RangeSlider(
+                id='drought-year',
+                min=2000,
+                max=2020
+            )
+        ],
+            className='six columns'
+        ),
+    ],
         className='row'
     ),
     get_emptyrow(),
@@ -845,7 +864,7 @@ def drought_graphs(combo_data, data, ma_value):
 
 
     drought_traces.append(go.Scatter(
-        name='DSCI Mov. Avg.',
+        name='DSCI Moving Average',
         y=df['MA'],
         x=df.index,
         marker_color = 'red',
