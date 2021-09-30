@@ -433,8 +433,9 @@ layout_drought = html.Div([
             className='eight columns'
         ), 
         html.Div([
+            dcc.Markdown('''Moving Avg in Weeks'''),
             daq.NumericInput(
-                id='our-numeric-input',
+                id='MA-input',
                 value=0
             ),
         ],
@@ -813,12 +814,13 @@ def lake_graph(bm_data, nav_data, fg_data):
     Output('dsci-graph', 'figure'),
     Output('diff-graph', 'figure'),],
     [Input('combo-water-data', 'data'),
-    Input('drought-data', 'data')])
-def drought_graph(combo_data, data):
+    Input('drought-data', 'data'),
+    Input('MA-input', 'value')])
+def drought_graphs(combo_data, data, ma_value):
     df = pd.read_json(data)
     # df_last = pd.read_json(last)
     # print(df_last)
-    df['MA'] = df['DSCI'].rolling(window=10).mean()
+    df['MA'] = df['DSCI'].rolling(window=ma_value).mean()
     # print(df)
 
 
