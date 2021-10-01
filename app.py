@@ -426,27 +426,75 @@ layout_drought = html.Div([
     ),
     html.Div([
         html.Div([
-            dcc.Graph(
-                id='drought-graph'
-            )
-        ],
-            className='eight columns'
-        ), 
-        html.Div([
-            dcc.Markdown('''Moving Avg in Weeks'''),
-            daq.NumericInput(
-                id='MA-input',
-                value=0
+            html.Div([
+                dcc.Graph(
+                    id='drought-graph'
+                )
+            ],
+                className='eight columns'
             ),
+            html.Div([
+                html.Div([
+                    html.Div([
+                        dcc.Markdown('''Moving Avg in Weeks'''),
+                    ],
+                        className='two columns'
+                    ),
+                    html.Div([
+                        daq.NumericInput(
+                            id='MA-input',
+                            value=1
+                        ),
+                    ],
+                        className='two columns'
+                    ),
+                ],
+                    className='row'
+                ),
+                html.Div([
+                    html.Div([
+                        html.Div(id='drought-stats'),
+                    ],
+                        className='twelve columns'
+                    ),
+                ],
+                    className='row'
+                ),
+            ],
+                className='four columns'
+            ),
+            # html.Div([
+            #     html.Div([
+            #         html.Div([
+            #             dcc.Markdown('''Moving Avg in Weeks'''),
+                        # daq.NumericInput(
+                        #     id='MA-input',
+                        #     value=0
+                        # ),
+            #         ],
+            #             className='one column'
+            #         ),
+                    # html.Div([
+                    #     html.H2('STATS', style={'text-align': 'center'}),
+                    # ],
+                    #     className='two columns'
+                    # ),
+            #     ],
+            #         className='four columns'
+            #     ),
+            # # html.Div([
+            # #     html.Div([
+            # #         html.H6('Mean DSCI')
+            # #     ],
+            # #         className='two columns'
+            # #     ),
+            # ],
+            #     className='row'
+            # ),
         ],
-            className='one column'
+            className='twelve columns'
         ),
-        html.Div([
-            html.H1('STATS'),
-        ],
-            className='three columns'
-        ),
-    ],  
+    ],      
         className='row'
     ),
     html.Div([
@@ -854,7 +902,7 @@ def drought_graphs(combo_data, data, ma_value):
     df_combo_last['diff'] = df_combo_last['Water Level'].diff()
     df_combo_last['diff'] = df_combo_last['diff'].apply(lambda x: x*-1)
 
-    print(df_combo_last)
+    # print(df_combo_last)
     #adi = annual dsci average
 
     df_ada = df[['DSCI']]
@@ -1239,7 +1287,17 @@ def get_current_volumes(powell_data, mead_data, combo_data, n):
         ],
             className='row'
         ),
-    ]), powell_last.to_json(), mead_last.to_json(), combo_last.to_json(), 
+    ]), powell_last.to_json(), mead_last.to_json(), combo_last.to_json(),
+
+@app.callback(
+    Output('drought-stats', 'children'),
+    [Input('drought-data', 'data'),
+    Input('combo-water-data', 'data')])
+def get_drought_stats(drought_data, combo_data):
+    df_drought = pd.read_json(drought_data)
+    df_combo = pd.read_json(combo_data)
+
+    return print(df_drought)
 
 @app.callback(
     Output('upper-cur-levels', 'children'),
