@@ -559,6 +559,8 @@ url_bar_and_content_div = html.Div([
 
 layout_powell = html.Div([
     get_header(),
+    get_navbar('non-home'),
+    get_emptyrow(),
 ])
 
 app.layout = url_bar_and_content_div
