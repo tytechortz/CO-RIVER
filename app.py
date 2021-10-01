@@ -296,7 +296,7 @@ homepage = html.Div([
         html.Div([
             dcc.Link(
                 html.H6(children='Powell Data'),
-                href='/apps/powell'
+                href='/powell'
             )
         ],
             className='four columns',
@@ -557,18 +557,9 @@ url_bar_and_content_div = html.Div([
 #     # dcc.Link('Navigate to "/page-2"', href='/page-2'),
 # ])
 
-# layout_ur = html.Div([
-#     get_header(),
-    # ur_App(),
-    # dcc.Input(id='input-1-state', type='text', value='Montreal'),
-    # dcc.Input(id='input-2-state', type='text', value='Canada'),
-    # html.Button(id='submit-button', n_clicks=0, children='Submit'),
-    # html.Div(id='output-state'),
-    # html.Br(),
-    # dcc.Link('Navigate to "/"', href='/'),
-    # html.Br(),
-    # dcc.Link('Navigate to "/page-2"', href='/page-2'),
-# ])
+layout_powell = html.Div([
+    get_header(),
+])
 
 app.layout = url_bar_and_content_div
 
@@ -578,6 +569,7 @@ app.validation_layout = html.Div([
     homepage,
     layout_ur,
     layout_drought,
+    layout_powell,
 ])
 
 # Index callbacks
@@ -590,6 +582,8 @@ def display_page(pathname):
         return layout_ur
     elif pathname == "/drought":
         return layout_drought
+    elif pathname == "/powell":
+        return layout_powell
     else:
         return homepage
 
