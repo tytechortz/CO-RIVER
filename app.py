@@ -545,6 +545,44 @@ layout_drought = html.Div([
     dcc.Store(id='combo-annual-change'),
 ])
 
+layout_powell = html.Div([
+    get_header(),
+    get_navbar('non-home'),
+    get_emptyrow(),
+    html.Div([
+        html.Div([
+            html.H1('Lake Powell', style={'text-align': 'center'})
+        ],
+            className='row'
+        ),
+        html.Div([
+            html.Div([
+                html.Div([], className='one column'),
+                html.Div([
+                    dcc.Graph(id='powell')
+                ],
+                    className='eleven columns'
+                ),
+                html.Div([], className='one column'),
+            ],
+                className='twelve columns'
+            ),
+        ],
+            className='row'
+        ),
+        html.Div([
+            daq.NumericInput(
+                id='powell-input',
+                value=1
+            ),
+        ],
+            className='two columns'
+        ),
+    ]),
+    dcc.Store(id='powell-water-data'),
+
+])
+
 url_bar_and_content_div = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
@@ -557,11 +595,7 @@ url_bar_and_content_div = html.Div([
 #     # dcc.Link('Navigate to "/page-2"', href='/page-2'),
 # ])
 
-layout_powell = html.Div([
-    get_header(),
-    get_navbar('non-home'),
-    get_emptyrow(),
-])
+
 
 app.layout = url_bar_and_content_div
 
@@ -606,7 +640,7 @@ def update_output(n_clicks, input1, input2):
 @app.callback([
     Output('powell-water-data', 'data'),
     Output('mead-water-data', 'data'),
-    Output('combo-water-data', 'data')],
+    Output('combo-water-data', 'data'),],
     [Input('interval-component', 'n_intervals'),
     Input('powell-water-data-raw', 'data'),
     Input('mead-water-data-raw', 'data')])
@@ -724,6 +758,35 @@ def clean_powell_data(n):
 
 
 #################### GRAPH CALLBACKS ################################
+@app.callback(
+    Output('powell', 'figure'),
+    [Input('powell-water-data', 'data'),
+    Input('powell-input', 'value')])
+def powell_graph(powell_data, value):
+    powell_df = pd.read_json(powell_data)
+    print(powell_df)
+    powell_traces = []
+    data = powell_df.sort_index()
+    print(value)
+    powell_traces.append(go.Scatter(
+        y = powell_df['Water Level'],
+        x = powell_df.index,
+        name='Water Level'
+    )),
+
+
+    powell_layout = go.Layout(
+        height =400,
+        title = 'Lake Powell',
+        yaxis = {'title':'Volume (AF)'},
+        paper_bgcolor="#1f2630",
+        plot_bgcolor="#1f2630",
+        font=dict(color="#2cfec1"),
+    )
+
+    return {'data': powell_traces, 'layout': powell_layout}
+
+
 
 @app.callback([
     Output('powell-levels', 'figure'),
@@ -736,7 +799,7 @@ def lake_graphs(powell_data, mead_data, combo_data):
     powell_df = pd.read_json(powell_data)
     mead_df = pd.read_json(mead_data)
     combo_df = pd.read_json(combo_data)
-
+    # print(powell_df)
     powell_traces = []
     mead_traces = []
     combo_traces = []
@@ -822,7 +885,7 @@ def lake_graph(bm_data, nav_data, fg_data):
     bm_df = pd.read_json(bm_data)
     nav_df = pd.read_json(nav_data)
     fg_df = pd.read_json(fg_data)
-    print(fg_df)
+    # print(fg_df)
 
     bm_traces = []
     nav_traces = []
@@ -1337,9 +1400,9 @@ def get_current_volumes_upper(bm_data, nav_data, fg_data, ur_data):
     fg_rec_low_date = fg_data['Value'].idxmin().strftime('%Y-%m-%d')
 
     ur_data = pd.read_json(ur_data)
-    print(ur_data)
+    # print(ur_data)
     ur_data['Storage'] = ur_data['Value_x'] + ur_data['Value_y'] + ur_data['Value']
-    print(ur_data)
+    # print(ur_data)
     ur_current_volume = ur_data['Storage'].iloc[-1]
     ur_pct = ur_current_volume / capacities['UR']
     ur_tfh_change = ur_current_volume - ur_data['Storage'][-2]
