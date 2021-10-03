@@ -505,9 +505,10 @@ layout_drought = html.Div([
             dcc.RangeSlider(
                 id='drought-year',
                 min=2000,
-                max=2020,
-                step=1,
-                marks={x: '{}'.format(x) for x in range(2000, 2021)},
+                max=2021,
+                # step=1,
+                marks={x: '{}'.format(x) for x in range(2000, 2022)},
+                value=[2000,2021]
             )
         ],
             className='six columns'
