@@ -441,8 +441,10 @@ layout_drought = html.Div([
                         className='two columns'
                     ),
                     html.Div([
-                        daq.NumericInput(
+                        dcc.Input(
                             id='MA-input',
+                            type='number',
+                            step=5,
                             value=1
                         ),
                     ],
@@ -571,12 +573,13 @@ layout_powell = html.Div([
             className='row'
         ),
         html.Div([
-            daq.NumericInput(
+            dcc.Input(
                 id='powell-input',
+                type='number',
                 value=1
             ),
         ],
-            className='two columns'
+            className='one column'
         ),
     ]),
     dcc.Store(id='powell-water-data'),
@@ -767,6 +770,7 @@ def powell_graph(powell_data, value):
     print(powell_df)
     powell_traces = []
     data = powell_df.sort_index()
+    
     print(value)
     powell_traces.append(go.Scatter(
         y = powell_df['Water Level'],
@@ -774,6 +778,23 @@ def powell_graph(powell_data, value):
         name='Water Level'
     )),
 
+    powell_traces.append(go.Scatter(
+        y = powell_df['power level'],
+        x = powell_df.index,
+        name = 'Power level'
+    )),
+
+    powell_traces.append(go.Scatter(
+        y = powell_df['sick pool'],
+        x = powell_df.index,
+        name = 'Sick Pool'
+    )),
+
+    powell_traces.append(go.Scatter(
+        y = powell_df['dead pool'],
+        x = powell_df.index,
+        name = 'Dead Pool'
+    )),
 
     powell_layout = go.Layout(
         height =400,
