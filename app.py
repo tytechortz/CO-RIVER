@@ -767,14 +767,15 @@ def clean_powell_data(n):
 @app.callback(
     Output('powell', 'figure'),
     [Input('powell-water-data', 'data'),
-    Input('powell-input', 'value')])
-def powell_graph(powell_data, value):
+    Input('powell-input', 'value'),
+    ])
+def powell_graph(powell_data, value, selected_year):
     powell_df = pd.read_json(powell_data)
-    print(powell_df)
+    # print(powell_df)
     powell_traces = []
     data = powell_df.sort_index()
     
-    print(value)
+    print(powell_df)
     powell_traces.append(go.Scatter(
         y = powell_df['Water Level'],
         x = powell_df.index,
@@ -800,9 +801,9 @@ def powell_graph(powell_data, value):
     )),
 
     powell_layout = go.Layout(
-        height =400,
-        title = 'Lake Powell',
-        yaxis = {'title':'Volume (AF)'},
+        height=400,
+        title='Lake Powell',
+        yaxis={'title':'Volume (AF)'},
         paper_bgcolor="#1f2630",
         plot_bgcolor="#1f2630",
         font=dict(color="#2cfec1"),
@@ -965,15 +966,21 @@ def lake_graph(bm_data, nav_data, fg_data):
     Output('diff-graph', 'figure'),],
     [Input('combo-water-data', 'data'),
     Input('drought-data', 'data'),
-    Input('MA-input', 'value')])
-def drought_graphs(combo_data, data, ma_value):
-    df = pd.read_json(data)
+    Input('MA-input', 'value'),
+    Input('drought-year', 'value')])
+def drought_graphs(combo_data, drought_data, ma_value, years):
+    print(years)
+    df = pd.read_json(drought_data)
     # df_last = pd.read_json(last)
     # print(df_last)
+    year1 = str(years[0])
+    year2 = str(years[1])
 
     df['MA'] = df['DSCI'].rolling(window=ma_value).mean()
+    
     # print(df)
-
+    # df = df.loc[year1:year2]
+    print(df)
 
     drought_traces = []
     dsci_traces = []
@@ -1063,11 +1070,18 @@ def drought_graphs(combo_data, data, ma_value):
 
     return {'data': drought_traces, 'layout': drought_layout}, {'data': dsci_traces, 'layout': dsci_layout}, {'data': diff_traces, 'layout': diff_layout}
 
-# @app.callback(
-#     Output('drought-graph', 'figure'),
-#     [Input('combo-water-data', 'data'),
-#     Input('drought-data', 'data')])
-# def dsci_diff_graph(combo_data, data):
+@app.callback(
+    Output('drought-stats', 'children'),
+    [Input('combo-water-data', 'data'),
+    Input('drought-data', 'data')])
+def drought_stats(combo_data, drought_data):
+    df = pd.read_json(drought_data)
+    current_dsci = df['DSCI'].iloc[1]
+    print(current_dsci)
+
+    return html.Div([
+        html.H6('Current DSCI = {}'.format(current_dsci))
+    ])
 
 #################### ANNUAL CHAANGE DATA ###############
 
@@ -1372,15 +1386,15 @@ def get_current_volumes(powell_data, mead_data, combo_data, n):
         ),
     ]), powell_last.to_json(), mead_last.to_json(), combo_last.to_json(),
 
-@app.callback(
-    Output('drought-stats', 'children'),
-    [Input('drought-data', 'data'),
-    Input('combo-water-data', 'data')])
-def get_drought_stats(drought_data, combo_data):
-    df_drought = pd.read_json(drought_data)
-    df_combo = pd.read_json(combo_data)
+# @app.callback(
+#     Output('drought-stats', 'children'),
+#     [Input('drought-data', 'data'),
+#     Input('combo-water-data', 'data')])
+# def get_drought_stats(drought_data, combo_data):
+#     df_drought = pd.read_json(drought_data)
+#     df_combo = pd.read_json(combo_data)
 
-    return print(df_drought)
+#     return print(df_drought)
 
 @app.callback(
     Output('upper-cur-levels', 'children'),
