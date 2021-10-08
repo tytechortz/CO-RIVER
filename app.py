@@ -966,7 +966,6 @@ def lake_graph(bm_data, nav_data, fg_data):
     Output('diff-graph', 'figure'),],
     [Input('combo-water-data', 'data'),
     Input('drought-data', 'data'),
-    Input('MA-input', 'value'),
     Input('drought-year', 'value')])
 def drought_graphs(combo_data, drought_data, ma_value, years):
     print(years)
@@ -1073,14 +1072,18 @@ def drought_graphs(combo_data, drought_data, ma_value, years):
 @app.callback(
     Output('drought-stats', 'children'),
     [Input('combo-water-data', 'data'),
+    Input('MA-input', 'value'),
     Input('drought-data', 'data')])
-def drought_stats(combo_data, drought_data):
+def drought_stats(combo_data, value, drought_data):
     df = pd.read_json(drought_data)
     current_dsci = df['DSCI'].iloc[1]
+    prev_dsci = df['DSCI'].iloc[value]
     print(current_dsci)
 
     return html.Div([
-        html.H6('Current DSCI = {}'.format(current_dsci))
+        html.H6('Current DSCI = {}'.format(current_dsci)),
+        html.H6('DSCI from {} weeks ago = {}'.format(value, prev_dsci)),
+
     ])
 
 #################### ANNUAL CHAANGE DATA ###############
